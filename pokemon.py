@@ -1,4 +1,5 @@
 import openpyxl
+import re
 def column_finder():
     wb = openpyxl.load_workbook("Book1.xlsx")
     ws = wb["mark"]
@@ -17,28 +18,18 @@ def number_adder():
     rowcount = 2
     for row in rows:
         for cell in row:
-            coordinate11 = f"{chr(ord(column_finder())+1)}{rowcount}"
-            coordinate10 = f"{chr(ord(column_finder())+2)}{rowcount}"
-            rowcount += 1
-            cellval = f"{cell.value}"
-            for i in range(len(cellval)):
-                if cellval[i].isnumeric():
-                    try:
-                        if cellval[i].isnumeric():
-                            if cellval[i+10].isnumeric() and cellval[i:i+10].isnumeric():
-                                numbers.append(cellval[i:i+11])
-                                i += 9
-                                ws[coordinate11] = cellval[i:i+11]
-                                wb.save("Book1.xlsx")
-                                continue
-                    except IndexError:
-                        pass
-                    try:
-                        if cellval[i+9].isnumeric() and cellval[i:i+9].isnumeric():
-                            numbers.append(cellval[i:i+10])
-                            i += 9
-                            ws[coordinate10] = cellval[i:i+10]
-                            wb.save("Book1.xlsx")
-                    except IndexError:
-                        continue
+            try:
+                coordinate10 = f"{chr(ord(column_finder()) + 1)}{rowcount}"
+                cellval = cell.value
+                pattern = r'\d{10,11}'
+                matches = re.findall(pattern, cellval)
+                for match in matches:
+                    numbers.append(match)
+                result_string = ', '.join(map(str, numbers))
+                ws[coordinate10] = result_string
+                wb.save("Book1.xlsx")
+                rowcount += 1
+                numbers = []
+            except TypeError:
+                pass
 print(number_adder())
